@@ -19,23 +19,7 @@ Content-Type: application/json
   "longitude": -46.6388
 }
 
-### 2. Transaction in Sao Paulo - Restaurant
-POST {{baseUrl}}/api/transactions
-Content-Type: application/json
-
-{
-  "transactionId": "TXN-002",
-  "userId": "USR-12345",
-  "merchant": "Outback Steakhouse",
-  "city": "Sao Paulo",
-  "transactionAmount": 189.90,
-  "transactionTime": "{{$isoTimestamp}}",
-  "cardNumber": "4444-5555-6666-7776",
-  "latitude": -23.5505,
-  "longitude": -46.6333
-}
-
-### 3. Suspicious Transaction in New York (same card, impossible travel)
+### 2. Suspicious Transaction in New York (same card, impossible travel)
 POST {{baseUrl}}/api/transactions
 Content-Type: application/json
 
@@ -46,135 +30,20 @@ Content-Type: application/json
   "city": "New York",
   "transactionAmount": 2499.00,
   "transactionTime": "{{$isoTimestamp}}",
-  "cardNumber": "4444-5555-6666-7776",
+  "cardNumber": "4444-5555-6666-7777",
   "latitude": 40.7580,
   "longitude": -73.9855
 }
 
-### 4. Transaction in London - Electronics Store
-POST {{baseUrl}}/api/transactions
-Content-Type: application/json
-
-{
-  "transactionId": "TXN-004",
-  "userId": "USR-67890",
-  "merchant": "Harrods",
-  "city": "London",
-  "transactionAmount": 450.00,
-  "transactionTime": "{{$isoTimestamp}}",
-  "cardNumber": "1111-2222-3333-4497",
-  "latitude": 51.4994,
-  "longitude": -0.1632
-}
-
-### 5. Suspicious Transaction in Tokyo (same card as London, impossible travel)
-POST {{baseUrl}}/api/transactions
-Content-Type: application/json
-
-{
-  "transactionId": "TXN-005",
-  "userId": "USR-67890",
-  "merchant": "Yodobashi Camera",
-  "city": "Tokyo",
-  "transactionAmount": 89000.00,
-  "transactionTime": "{{$isoTimestamp}}",
-  "cardNumber": "1111-2222-3333-4478",
-  "latitude": 35.6762,
-  "longitude": 139.6503
-}
-
-### VELOCITY CHECK - Run all 4 quickly!    
-
-### 6. Velocity Test - Transaction 1 (same card, same city)
-POST {{baseUrl}}/api/transactions
-Content-Type: application/json
-
-{
-  "transactionId": "VEL-001",
-  "userId": "USR-VELOCITY",
-  "merchant": "Gas Station",
-  "city": "Miami",
-  "transactionAmount": 50.00,
-  "transactionTime": "{{$isoTimestamp}}",
-  "cardNumber": "9999-8888-7777-6666",
-  "latitude": 25.7617,
-  "longitude": -80.1918
-}
-
-### 7. Velocity Test - Transaction 2
-POST {{baseUrl}}/api/transactions
-Content-Type: application/json
-
-{
-  "transactionId": "VEL-002",
-  "userId": "USR-VELOCITY",
-  "merchant": "Convenience Store",
-  "city": "Miami",
-  "transactionAmount": 15.00,
-  "transactionTime": "{{$isoTimestamp}}",
-  "cardNumber": "9999-8888-7777-6666",
-  "latitude": 25.7617,
-  "longitude": -80.1918
-}
-
-### 8. Velocity Test - Transaction 3
-POST {{baseUrl}}/api/transactions
-Content-Type: application/json
-
-{
-  "transactionId": "VEL-003",
-  "userId": "USR-VELOCITY",
-  "merchant": "Fast Food",
-  "city": "Miami",
-  "transactionAmount": 12.00,
-  "transactionTime": "{{$isoTimestamp}}",
-  "cardNumber": "9999-8888-7777-6666",
-  "latitude": 25.7617,
-  "longitude": -80.1918
-}
-
-### 9. Velocity Test - Transaction 4 (triggers VELOCITY_CHECK alert!)
-POST {{baseUrl}}/api/transactions
-Content-Type: application/json
-
-{
-  "transactionId": "VEL-004",
-  "userId": "USR-VELOCITY",
-  "merchant": "Pharmacy",
-  "city": "Miami",
-  "transactionAmount": 8.00,
-  "transactionTime": "{{$isoTimestamp}}",
-  "cardNumber": "9999-8888-7777-6666",
-  "latitude": 25.7617,
-  "longitude": -80.1918
-}
-
-### 10. Vector search test = trigger a fraud by matching similar fraud transactions
-POST {{baseUrl}}/api/transactions
-Content-Type: application/json
-
-{
-  "transactionId": "TXN-006",
-  "userId": "USR-12345",
-  "merchant": "Gas Station",
-  "city": "London",
-  "transactionAmount": 13213122.71,
-  "transactionTime": "{{$isoTimestamp}}",
-  "cardNumber": "4444-5555-6666-82567",
-  "latitude": 51.5072,
-  "longitude": -0.1276
-}
-
-
-### 11 - Fraud.
+### 4. Vector search test = trigger a fraud by matching similar fraud transactions
 
 POST {{baseUrl}}/api/transactions
 Content-Type: application/json
 
 {
-  "transactionId": "TXN-DEMO-FRAUD-001",
+  "transactionId": "TXN-99",
   "userId": "USR-90001",
-  "merchant": "Crypto Exchange",
+  "merchant": "Money Exchange",
   "city": "New York",
   "transactionAmount": 1850.00,
   "transactionTime": "2026-02-20T02:15:00Z",
@@ -183,7 +52,7 @@ Content-Type: application/json
   "longitude": -74.0060
 }
 
-### 12 - Not Fraud
+### 5. Vector search test - Not fraud
 POST {{baseUrl}}/api/transactions
 Content-Type: application/json
 
