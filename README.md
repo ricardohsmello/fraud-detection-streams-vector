@@ -75,7 +75,33 @@ mongosh "$MONGODB_URI" --file scripts/seed-nonfraud-patterns-100.mongosh
 
 ---
 
-### 3. Set environment variables
+### 3. Create the Vector Search Index
+
+Run the following command to create the Atlas Vector Search index required for fraud pattern scoring:
+
+```bash
+mongosh "$MONGODB_URI" --eval '
+db.getSiblingDB("fraud-detection").fraud_patterns.createSearchIndex(
+  "fraud_patterns_vector_index",
+  "vectorSearch",
+  {
+    fields: [
+      {
+        type: "vector",
+        path: "embedding",
+        numDimensions: 1024,
+        similarity: "cosine"
+      }
+    ]
+  }
+)'
+```
+
+> The index may take a few minutes to become active on Atlas. You can check its status in the **Atlas UI → Search Indexes** tab.
+
+---
+
+### 4. Set environment variables
 
 ```bash
 export MONGODB_URI="mongodb+srv://<user>:<password>@<cluster>.mongodb.net/?appName=devrel-tutorial-java-frauddetection"
@@ -84,7 +110,7 @@ export VOYAGEAI_API_KEY="your-voyage-api-key"
 
 ---
 
-### 4. Run the application
+### 5. Run the application
 
 ```bash
 ./mvnw spring-boot:run
@@ -96,7 +122,7 @@ The API will be available at `http://localhost:8081`.
 
 ---
 
-### 5. Send a transaction
+### 6. Send a transaction
 
 ```bash
 curl -X POST http://localhost:8081/api/transactions \
