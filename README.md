@@ -25,25 +25,7 @@ https://mdb.link/devnexus/fraud-detection-presentation
 
 ## How It Works
 
-```
-                                       ┌─────────────────────────┐
-                                       │ transactions-suspicious │
-                                       │       (FraudAlert)      │
-                                       └────────────▲────────────┘
-                                                    │ YES
-                                                    │
-┌─────────────┐    ┌──────────────┐    ┌───────────┴───────────┐
-│ Transaction │───▶│ transactions │───▶│     Kafka Streams     │
-└─────────────┘    └──────────────┘    │     (Fraud Rules)     │
-                                       │                       │
-                                       │   hasFraudAlert()?    │
-                                       └───────────┬───────────┘
-                                                   │ NO
-                                       ┌───────────▼───────────┐
-                                       │ transactions-to-score  │
-                                       │     (Transaction)      │
-                                       └───────────────────────┘
-```
+![Flow](docs/flow.png)
 
 1. A transaction is sent via REST API to `transactions` topic
 2. Kafka Streams processes and groups by card number
@@ -61,29 +43,60 @@ https://mdb.link/devnexus/fraud-detection-presentation
 
 ## Running
 
+### Prerequisites
+
+- Docker & Docker Compose
+- Java 21
+- [MongoDB Atlas](https://www.mongodb.com/atlas) cluster with **Vector Search** enabled
+- [Voyage AI](https://www.voyageai.com) API key
+
+---
+
 ### 1. Start Kafka
 
 ```bash
-docker run -d --name kafka -p 9092:9092 apache/kafka:latest
+docker compose up -d
 ```
 
-### 2. Create Topics
+This starts Kafka, creates all required topics automatically, and spins up **Kafka UI** at `http://localhost:8080`.
+
+---
+
+### 2. Seed the MongoDB collection
+
+The seed scripts populate the `fraud_patterns` collection with labeled fraud and non-fraud transaction patterns used for vector similarity search.
 
 ```bash
-bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic transactions --partitions 1
-
-bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic transactions-suspicious --partitions 1
-
-bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic transactions-to-score --partitions 1
+mongosh "$MONGODB_URI" --file scripts/seed-fraud-patterns-100.mongosh
+mongosh "$MONGODB_URI" --file scripts/seed-nonfraud-patterns-100.mongosh
 ```
 
-### 3. Run the Application
+> After running, the collection `fraud-detection.fraud_patterns` will have 200 documents ready for vector search.
+
+---
+
+### 3. Set environment variables
+
+```bash
+export MONGODB_URI="mongodb+srv://<user>:<password>@<cluster>.mongodb.net/?appName=devrel-tutorial-java-frauddetection"
+export VOYAGEAI_API_KEY="your-voyage-api-key"
+```
+
+---
+
+### 4. Run the application
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-### 4. Send a Transaction
+The API will be available at `http://localhost:8081`.
+
+> On startup, the application automatically detects all documents in `fraud_patterns` that have no embedding and backfills them by calling Voyage AI. All 200 seeded documents will be embedded and updated in MongoDB before the app is fully ready.
+
+---
+
+### 5. Send a transaction
 
 ```bash
 curl -X POST http://localhost:8081/api/transactions \
@@ -101,26 +114,7 @@ curl -X POST http://localhost:8081/api/transactions \
   }'
 ```
 
-### 5. Watch Suspicious Transactions
+See `src/main/resources/http/fraud-detection.http` for more example requests including impossible travel, velocity check, and vector search scenarios.
 
-```bash
-bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic transactions-suspicious --from-beginning
-```
+---
 
-### Auto-generate Transactions
-
-Enable the generator to publish one transaction per second:
-
-```bash
-mvn spring-boot:run -Dspring-boot.run.arguments="--app.generator.enabled=true"
-```
-
-You can override the interval with `--app.generator.interval-ms=1000`.
-
-## Testing Fraud Detection
-
-**Impossible Travel:** Send two transactions with the same card from distant locations in quick succession (e.g., Sao Paulo → New York).
-
-**Velocity Check:** Send 4+ transactions with the same card within 1 minute.
-
-See `src/main/resources/http/fraud-detection.http` for example requests.
