@@ -11,7 +11,7 @@ https://mdb.link/devnexus/fraud-detection-presentation
 - Java 21
 - Spring Boot 4
 - Kafka Streams
-- MongoDB *(coming soon)*
+- MongoDB 
 - Voyage AI *(embedding generation)*
 
 ## Kafka Topics
