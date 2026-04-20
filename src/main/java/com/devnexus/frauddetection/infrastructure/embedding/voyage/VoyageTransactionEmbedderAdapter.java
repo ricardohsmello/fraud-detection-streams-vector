@@ -34,7 +34,7 @@ public class VoyageTransactionEmbedderAdapter implements TransactionEmbedderPort
 		var res = client.embed(new EmbeddingsRequest(
 				List.of(input), config.model(), "query", config.outputDimension()));
 
-		log.info("[VECTOR SCORING] Embeddings generated	successfully");
+		log.info("[VECTOR SCORING] Embeddings generated\tsuccessfully{}", res.data().getFirst().embedding());
 
 		var embedding = res.data().getFirst().embedding();
 
