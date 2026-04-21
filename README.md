@@ -119,7 +119,6 @@ export VOYAGEAI_API_KEY="your-voyage-api-key"
 The API will be available at `http://localhost:8081`.
 
 > On startup, the application automatically detects all documents in `fraud_patterns` that have no embedding and backfills them by calling Voyage AI. All 200 seeded documents will be embedded and updated in MongoDB before the app is fully ready.
-
 ---
 
 ### 6. Send a transaction
