@@ -1,6 +1,5 @@
 # Fraud Detection
 
-
 Real-time fraud detection pipeline that scores card transactions using Kafka Streams, behavioral embeddings, and rule-based guardrails — without training a custom model.
 
 ## Slides
